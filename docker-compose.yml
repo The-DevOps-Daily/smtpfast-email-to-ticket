@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: tickets
+      POSTGRES_USER: tickets
+      POSTGRES_PASSWORD: tickets
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tickets -d tickets"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+    ports:
+      - "${POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - ticket_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://tickets:tickets@postgres:5432/tickets
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["sh", "-c", "node dist/db/migrate.js && node dist/server.js"]
+    ports:
+      - "3000:3000"
+
+volumes:
+  ticket_data:

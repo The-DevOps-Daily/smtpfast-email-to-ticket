@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+.env
+.DS_Store
+
+# The DEV.to draft is temporary working material, not part of the app repository.
+article/
